@@ -2,7 +2,6 @@ package ru.hits.kt1.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 import ru.hits.kt1.Enum.SlotType;
 
 @Data
@@ -10,8 +9,6 @@ import ru.hits.kt1.Enum.SlotType;
 @Table(name = "schedule_period")
 public class SchedulePeriod {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(updatable = false, length = 32)
     private String id;
     @Column(name = "slot_id", nullable = false, length = 32)
@@ -25,13 +22,4 @@ public class SchedulePeriod {
     private String administratorId;
     @Column(name = "executor_id", length = 32)
     private String executorId;
-
-
-    @PrePersist
-    @PreUpdate
-    public void setDefaultSlotType() {
-        if (this.slotType == null) {
-            this.slotType = SlotType.UNDEFINED;
-        }
-    }
 }

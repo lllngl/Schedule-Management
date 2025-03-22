@@ -4,21 +4,19 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "schedule")
 public class Schedule {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(updatable = false, length = 32)
     private String id;
     @Column(name = "schedule_name")
     private String scheduleName;
     @Column(name = "creation_date", nullable = false)
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
     @Column(name = "update_date", nullable = false)
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
 }
