@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.hits.kt1.dto.CreateScheduleDto;
 import ru.hits.kt1.dto.FullScheduleDto;
 import ru.hits.kt1.dto.PeriodDto;
+import ru.hits.kt1.exceptions.NotFoundException;
+import ru.hits.kt1.exceptions.ValidationException;
 import ru.hits.kt1.models.Schedule;
 import ru.hits.kt1.models.SchedulePeriod;
 import ru.hits.kt1.repository.SchedulePeriodRepository;
@@ -26,7 +28,7 @@ public class ScheduleService {
 
     public Schedule createSchedule(CreateScheduleDto DTO) {
         if (DTO.getScheduleName() == null) {
-            throw new IllegalArgumentException("scheduleName can't be null");
+            throw new ValidationException("scheduleName can't be null");
         }
 
         Schedule schedule = new Schedule();
@@ -44,34 +46,34 @@ public class ScheduleService {
 
     public Schedule getScheduleById(String id) {
         return scheduleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+                .orElseThrow(() -> new NotFoundException("Schedule not found"));
     }
 
 
     public FullScheduleDto getFullSchedule(String id, String name) {
         if (id == null && name == null) {
-            throw new IllegalArgumentException("Id or name can't be null");
+            throw new ValidationException("Both the id and the name can't be null");
         }
 
         Schedule schedule;
 
         if (id != null && name != null) {
             Schedule scheduleById = scheduleRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Schedule with that id not found"));
+                    .orElseThrow(() -> new NotFoundException("Schedule with that id not found"));
             Schedule scheduleByName = scheduleRepository.findByScheduleName(name)
-                    .orElseThrow(() -> new RuntimeException("Schedule with that name not found"));
+                    .orElseThrow(() -> new NotFoundException("Schedule with that name not found"));
 
             if (scheduleByName == null || !scheduleById.getId().equals(scheduleByName.getId())) {
-                throw new IllegalArgumentException("Id and name unmatched");
+                throw new ValidationException("Schedule id and name unmatched");
             }
             schedule = scheduleById;
 
         } else if (id != null) {
             schedule = scheduleRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Schedule with that id not found"));
+                    .orElseThrow(() -> new NotFoundException("Schedule with that id not found"));
         } else {
             schedule = scheduleRepository.findByScheduleName(name)
-                    .orElseThrow(() -> new RuntimeException("Schedule with that name not found"));
+                    .orElseThrow(() -> new NotFoundException("Schedule with that name not found"));
         }
 
         FullScheduleDto fullScheduleDto = new FullScheduleDto();

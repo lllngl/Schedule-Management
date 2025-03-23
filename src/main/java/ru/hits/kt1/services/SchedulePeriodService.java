@@ -12,6 +12,8 @@ import ru.hits.kt1.Specification.PeriodFiltration;
 import ru.hits.kt1.dto.CreateSchedulePeriodDto;
 import ru.hits.kt1.dto.FilterDto;
 import ru.hits.kt1.dto.SortDto;
+import ru.hits.kt1.exceptions.NotFoundException;
+import ru.hits.kt1.exceptions.ValidationException;
 import ru.hits.kt1.models.Employee;
 import ru.hits.kt1.models.Schedule;
 import ru.hits.kt1.models.SchedulePeriod;
@@ -36,22 +38,27 @@ public class SchedulePeriodService {
 
     public SchedulePeriod createSchedulePeriod(CreateSchedulePeriodDto DTO, String administratorId) {
         if (DTO.getSlotId() == null || DTO.getScheduleId() == null) {
-            throw new IllegalArgumentException("Fields can't be null");
+            throw new ValidationException("Fields can't be null");
         }
 
         Optional<Schedule> existingSchedule = scheduleRepository.findById(DTO.getScheduleId());
         if (existingSchedule.isEmpty()) {
-            throw new RuntimeException("Schedule not found");
+            throw new NotFoundException("Schedule not found");
         }
 
         Optional<Slot> existingSlot = slotRepository.findById(DTO.getSlotId());
         if (existingSlot.isEmpty()) {
-            throw new RuntimeException("Slot not found");
+            throw new NotFoundException("Slot not found");
         }
 
         Optional<Employee> existingEmployee = employeeRepository.findById(administratorId);
         if (existingEmployee.isEmpty()) {
-            throw new RuntimeException("Administrator not found");
+            throw new NotFoundException("Administrator not found");
+        }
+
+        if (DTO.getSlotType() != SlotType.LOCAL && DTO.getSlotType() != SlotType.FROM_HOME &&
+                DTO.getSlotType() != SlotType.UNDEFINED && DTO.getSlotType() != null) {
+            throw new ValidationException("This slot type doesn't exist");
         }
 
         OffsetTime beginTime = existingSlot.get().getBeginTime();
@@ -61,7 +68,7 @@ public class SchedulePeriodService {
 
         for (SchedulePeriod period : allPeriods) {
             if (period.getBeginTime().isBefore(endTime) && period.getEndTime().isAfter(beginTime)) {
-                throw new RuntimeException("The new period overlaps with existing periods");
+                throw new ValidationException("The new period overlaps with existing periods");
             }
         }
 
@@ -70,7 +77,7 @@ public class SchedulePeriodService {
         if (DTO.getExecutorId() != null) {
             Optional<Employee> existingExecutor = employeeRepository.findById(DTO.getExecutorId());
             if (existingExecutor.isEmpty()) {
-                throw new RuntimeException("Executor not found");
+                throw new NotFoundException("Executor not found");
             }
             schedulePeriod.setExecutorId(DTO.getExecutorId());
         }
@@ -94,7 +101,7 @@ public class SchedulePeriodService {
 
     public SchedulePeriod getSchedulePeriod(String id) {
         return schedulePeriodRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Schedule period not found"));
+                .orElseThrow(() -> new NotFoundException("Schedule period not found"));
     }
 
     public List<SchedulePeriod> getAllPeriods(FilterDto filter, SortDto sort, int page, int size) {

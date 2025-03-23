@@ -3,6 +3,8 @@ package ru.hits.kt1.services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.hits.kt1.dto.CreateTemplateDto;
+import ru.hits.kt1.exceptions.NotFoundException;
+import ru.hits.kt1.exceptions.ValidationException;
 import ru.hits.kt1.models.Template;
 import ru.hits.kt1.repository.TemplateRepository;
 
@@ -16,7 +18,7 @@ public class TemplateService {
 
     public Template createTemplate(CreateTemplateDto DTO) {
         if (DTO.getTemplateType() == null) {
-            throw new IllegalArgumentException("templateType can't be null");
+            throw new ValidationException("templateType can't be null");
         }
 
         Template template = new Template();
@@ -31,6 +33,6 @@ public class TemplateService {
 
     public Template getTemplateById(String id) {
         return templateRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Template not found"));
+                .orElseThrow(() -> new NotFoundException("Template not found"));
     }
 }

@@ -3,6 +3,8 @@ package ru.hits.kt1.services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.hits.kt1.dto.CreateSlotDTO;
+import ru.hits.kt1.exceptions.NotFoundException;
+import ru.hits.kt1.exceptions.ValidationException;
 import ru.hits.kt1.models.Slot;
 import ru.hits.kt1.models.Template;
 import ru.hits.kt1.repository.SlotRepository;
@@ -19,12 +21,12 @@ public class SlotService {
 
     public Slot createSlot(CreateSlotDTO DTO) {
         if (DTO.getScheduleTemplateId() == null || DTO.getBeginTime() == null || DTO.getEndTime() == null) {
-            throw new IllegalArgumentException("Fields can't be null");
+            throw new ValidationException("Fields can't be null");
         }
 
         Optional<Template> existingTemplate = templateRepository.findById(DTO.getScheduleTemplateId());
         if (existingTemplate.isEmpty()) {
-            throw new RuntimeException("Template not found");
+            throw new NotFoundException("Template not found");
         }
 
         Slot slot = new Slot();
@@ -41,6 +43,6 @@ public class SlotService {
 
     public Slot getSlotById(String id) {
         return slotRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Slot not found"));
+                .orElseThrow(() -> new NotFoundException("Slot not found"));
     }
 }
