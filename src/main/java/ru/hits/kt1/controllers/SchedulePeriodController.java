@@ -24,9 +24,7 @@ public class SchedulePeriodController {
     }
 
     @GetMapping("/{id}")
-    public SchedulePeriod getSchedulePeriodById(@PathVariable String id) {
-        return schedulePeriodService.getSchedulePeriod(id);
-    }
+    public SchedulePeriod getSchedulePeriodById(@PathVariable String id) { return schedulePeriodService.getSchedulePeriod(id); }
 
     @GetMapping
     public List<SchedulePeriod> getAllPeriods(@RequestParam(required = false) String id,
@@ -55,8 +53,9 @@ public class SchedulePeriodController {
         if (page < 0) { page = 0;}
         if (size <= 0) { size = 3; }
 
-        List<SchedulePeriod> periods = schedulePeriodService.getAllPeriods(filter, sort, page, size);
-
-        return periods;
+        return schedulePeriodService.getAllPeriods(filter, sort, page, size);
     }
+
+    @DeleteMapping("/{id}")
+    public void deletePeriod(@PathVariable String id) { schedulePeriodService.deletePeriod(id); }
 }

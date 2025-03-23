@@ -21,4 +21,7 @@ public class TemplateController {
     public Template getTemplateById(@PathVariable String id) {
         return templateService.getTemplateById(id);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteTemplate(@PathVariable String id) { templateService.deleteTemplate(id); }
 }

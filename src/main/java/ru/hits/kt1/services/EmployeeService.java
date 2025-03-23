@@ -48,4 +48,9 @@ public class EmployeeService {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found"));
     }
+
+    public void deleteEmployee(String id) {
+        if (!employeeRepository.existsById(id)) { throw new NotFoundException("Employee not found"); }
+        employeeRepository.deleteById(id);
+    }
 }

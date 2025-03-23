@@ -35,4 +35,9 @@ public class TemplateService {
         return templateRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Template not found"));
     }
+
+    public void deleteTemplate(String id) {
+        if (!templateRepository.existsById(id)) { throw new NotFoundException("Template not found"); }
+        templateRepository.deleteById(id);
+    }
 }

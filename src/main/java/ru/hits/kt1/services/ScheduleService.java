@@ -24,7 +24,6 @@ public class ScheduleService {
 
     private ScheduleRepository scheduleRepository;
     private SchedulePeriodRepository schedulePeriodRepository;
-    private SlotRepository slotRepository;
 
     public Schedule createSchedule(CreateScheduleDto DTO) {
         if (DTO.getScheduleName() == null) {
@@ -44,10 +43,13 @@ public class ScheduleService {
         return scheduleRepository.save(schedule);
     }
 
+
+
     public Schedule getScheduleById(String id) {
         return scheduleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Schedule not found"));
     }
+
 
 
     public FullScheduleDto getFullSchedule(String id, String name) {
@@ -103,5 +105,12 @@ public class ScheduleService {
         dto.setBeginTime(period.getBeginTime());
 
         return dto;
+    }
+
+
+
+    public void deleteSchedule(String id) {
+        if (!scheduleRepository.existsById(id)) { throw new NotFoundException("Schedule not found"); }
+        scheduleRepository.deleteById(id);
     }
 }

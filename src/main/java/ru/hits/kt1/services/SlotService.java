@@ -45,4 +45,9 @@ public class SlotService {
         return slotRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Slot not found"));
     }
+
+    public void deleteSlot(String id) {
+        if (!slotRepository.existsById(id)) { throw new NotFoundException("Slot not found"); }
+        slotRepository.deleteById(id);
+    }
 }

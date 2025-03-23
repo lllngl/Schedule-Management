@@ -14,18 +14,17 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
-    public Schedule createSchedule(@RequestBody CreateScheduleDto schedule) {
-        return scheduleService.createSchedule(schedule);
-    }
+    public Schedule createSchedule(@RequestBody CreateScheduleDto schedule) { return scheduleService.createSchedule(schedule); }
 
     @GetMapping("/{id}")
-    public Schedule getScheduleById(@PathVariable String id) {
-        return scheduleService.getScheduleById(id);
-    }
+    public Schedule getScheduleById(@PathVariable String id) { return scheduleService.getScheduleById(id); }
 
     @GetMapping("/full")
     public FullScheduleDto getFullSchedule(@RequestParam(required = false) String id,
                                            @RequestParam(required = false) String name) {
         return scheduleService.getFullSchedule(id, name);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteSchedule(@PathVariable String id) {scheduleService.deleteSchedule(id);}
 }

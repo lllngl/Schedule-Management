@@ -99,10 +99,14 @@ public class SchedulePeriodService {
         return schedulePeriodRepository.save(schedulePeriod);
     }
 
+
+
     public SchedulePeriod getSchedulePeriod(String id) {
         return schedulePeriodRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Schedule period not found"));
     }
+
+
 
     public List<SchedulePeriod> getAllPeriods(FilterDto filter, SortDto sort, int page, int size) {
         Specification<SchedulePeriod> spec = Specification
@@ -121,5 +125,12 @@ public class SchedulePeriodService {
         Page<SchedulePeriod> periodsPage = schedulePeriodRepository.findAll(spec, pageable);
 
         return periodsPage.getContent();
+    }
+
+
+
+    public void deletePeriod(String id) {
+        if (!schedulePeriodRepository.existsById(id)) { throw new NotFoundException("Schedule period not found"); }
+        schedulePeriodRepository.deleteById(id);
     }
 }
