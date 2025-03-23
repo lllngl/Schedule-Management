@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.hits.kt1.Enum.SlotType;
 import ru.hits.kt1.dto.CreateSchedulePeriodDto;
+import ru.hits.kt1.models.Employee;
 import ru.hits.kt1.models.Schedule;
 import ru.hits.kt1.models.SchedulePeriod;
 import ru.hits.kt1.models.Slot;
+import ru.hits.kt1.repository.EmployeeRepository;
 import ru.hits.kt1.repository.SchedulePeriodRepository;
 import ru.hits.kt1.repository.ScheduleRepository;
 import ru.hits.kt1.repository.SlotRepository;
@@ -20,6 +22,7 @@ public class SchedulePeriodService {
     private SchedulePeriodRepository schedulePeriodRepository;
     private ScheduleRepository scheduleRepository;
     private SlotRepository slotRepository;
+    private EmployeeRepository employeeRepository;
 
     public SchedulePeriod createSchedulePeriod(CreateSchedulePeriodDto DTO, String administratorId) {
         if (DTO.getSlotId() == null || DTO.getScheduleId() == null) {
@@ -36,12 +39,18 @@ public class SchedulePeriodService {
             throw new RuntimeException("Slot not found");
         }
 
+        Optional<Employee> existingEmployee = employeeRepository.findById(administratorId);
+        if (existingEmployee.isEmpty()) {
+            throw new RuntimeException("Administrator not found");
+        }
+
         SchedulePeriod schedulePeriod = new SchedulePeriod();
 
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        schedulePeriod.setId(uuid);
-
-        if (DTO.getExecutorId() != null && !DTO.getExecutorId().equals(administratorId)) {
+        if (DTO.getExecutorId() != null) {
+            Optional<Employee> existingExecutor = employeeRepository.findById(DTO.getExecutorId());
+            if (existingExecutor.isEmpty()) {
+                throw new RuntimeException("Executor not found");
+            }
             schedulePeriod.setExecutorId(DTO.getExecutorId());
         }
 
@@ -49,8 +58,12 @@ public class SchedulePeriodService {
             schedulePeriod.setExecutorId(administratorId);
         }
 
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        schedulePeriod.setId(uuid);
+
         schedulePeriod.setScheduleId(DTO.getScheduleId());
         schedulePeriod.setSlotId(DTO.getSlotId());
+        schedulePeriod.setBeginTime(existingSlot.get().getBeginTime());
         schedulePeriod.setAdministratorId(administratorId);
         schedulePeriod.setSlotType(DTO.getSlotType() != null ? DTO.getSlotType() : SlotType.UNDEFINED);
 

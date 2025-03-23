@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.hits.kt1.Enum.SlotType;
 
+import java.time.OffsetTime;
+
 @Data
 @Entity
 @Table(name = "schedule_period")
@@ -22,4 +24,6 @@ public class SchedulePeriod {
     private String administratorId;
     @Column(name = "executor_id", length = 32)
     private String executorId;
+    @Column(name = "begin_time", nullable = false)
+    private OffsetTime beginTime;
 }
