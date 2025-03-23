@@ -113,4 +113,8 @@ public class ScheduleService {
         if (!scheduleRepository.existsById(id)) { throw new NotFoundException("Schedule not found"); }
         scheduleRepository.deleteById(id);
     }
+
+
+
+    public List<Schedule> getAllSchedules() { return scheduleRepository.findAll(); }
 }

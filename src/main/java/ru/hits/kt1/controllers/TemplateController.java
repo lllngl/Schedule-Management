@@ -6,6 +6,8 @@ import ru.hits.kt1.dto.CreateTemplateDto;
 import ru.hits.kt1.models.Template;
 import ru.hits.kt1.services.TemplateService;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/template")
@@ -24,4 +26,7 @@ public class TemplateController {
 
     @DeleteMapping("/{id}")
     public void deleteTemplate(@PathVariable String id) { templateService.deleteTemplate(id); }
+
+    @GetMapping("/all")
+    public List<Template> getAllTemplates() { return templateService.getAllTemplates(); }
 }

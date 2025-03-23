@@ -10,6 +10,7 @@ import ru.hits.kt1.exceptions.ValidationException;
 import ru.hits.kt1.models.Employee;
 import ru.hits.kt1.repository.EmployeeRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -53,4 +54,6 @@ public class EmployeeService {
         if (!employeeRepository.existsById(id)) { throw new NotFoundException("Employee not found"); }
         employeeRepository.deleteById(id);
     }
+
+    public List<Employee> getAllEmployees() { return employeeRepository.findAll(); }
 }

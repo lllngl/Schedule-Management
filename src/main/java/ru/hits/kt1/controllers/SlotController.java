@@ -6,6 +6,8 @@ import ru.hits.kt1.dto.CreateSlotDTO;
 import ru.hits.kt1.models.Slot;
 import ru.hits.kt1.services.SlotService;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/slot")
@@ -24,4 +26,7 @@ public class SlotController {
 
     @DeleteMapping("/{id}")
     public void deleteSlot(@PathVariable String id) { slotService.deleteSlot(id); }
+
+    @GetMapping("/all")
+    public List<Slot> getAllSlots() { return slotService.getAllSlots(); }
 }

@@ -10,6 +10,7 @@ import ru.hits.kt1.models.Template;
 import ru.hits.kt1.repository.SlotRepository;
 import ru.hits.kt1.repository.TemplateRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,4 +51,6 @@ public class SlotService {
         if (!slotRepository.existsById(id)) { throw new NotFoundException("Slot not found"); }
         slotRepository.deleteById(id);
     }
+
+    public List<Slot> getAllSlots() { return slotRepository.findAll(); }
 }

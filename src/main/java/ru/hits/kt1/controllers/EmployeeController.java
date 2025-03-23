@@ -6,6 +6,8 @@ import ru.hits.kt1.dto.CreateEmployeeDto;
 import ru.hits.kt1.models.Employee;
 import ru.hits.kt1.services.EmployeeService;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/employee")
@@ -20,4 +22,7 @@ public class EmployeeController {
 
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable String id) { employeeService.deleteEmployee(id); }
+
+    @GetMapping("/all")
+    public List<Employee> getAllEmployees() { return employeeService.getAllEmployees(); }
 }

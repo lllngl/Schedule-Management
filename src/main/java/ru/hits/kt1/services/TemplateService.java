@@ -9,6 +9,7 @@ import ru.hits.kt1.models.Template;
 import ru.hits.kt1.repository.TemplateRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,4 +41,6 @@ public class TemplateService {
         if (!templateRepository.existsById(id)) { throw new NotFoundException("Template not found"); }
         templateRepository.deleteById(id);
     }
+
+    public List<Template> getAllTemplates() { return templateRepository.findAll(); }
 }

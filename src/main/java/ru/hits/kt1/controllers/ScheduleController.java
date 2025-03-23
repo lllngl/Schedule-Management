@@ -7,6 +7,8 @@ import ru.hits.kt1.dto.FullScheduleDto;
 import ru.hits.kt1.models.Schedule;
 import ru.hits.kt1.services.ScheduleService;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/schedule")
@@ -27,4 +29,7 @@ public class ScheduleController {
 
     @DeleteMapping("/{id}")
     public void deleteSchedule(@PathVariable String id) {scheduleService.deleteSchedule(id);}
+
+    @GetMapping("/all")
+    public List<Schedule> getAllSchedules() {return scheduleService.getAllSchedules();}
 }
