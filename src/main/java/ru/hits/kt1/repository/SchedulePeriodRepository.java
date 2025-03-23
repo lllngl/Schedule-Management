@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface SchedulePeriodRepository extends JpaRepository<SchedulePeriod, String>, JpaSpecificationExecutor<SchedulePeriod> {
     List<SchedulePeriod> findByScheduleIdOrderByBeginTime(String scheduleId);
+    List<SchedulePeriod> findAllByScheduleId(String scheduleId);
 }

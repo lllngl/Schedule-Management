@@ -48,13 +48,6 @@ public class SchedulePeriodController {
         filter.setAdministratorId(administratorId);
         filter.setExecutorId(executorId);
 
-        System.out.println("Filter ID: " + filter.getId());
-        System.out.println("Filter Slot ID: " + filter.getSlotId());
-        System.out.println("Filter Schedule ID: " + filter.getScheduleId());
-        System.out.println("Filter Slot Type: " + filter.getSlotType());
-        System.out.println("Filter Administrator ID: " + filter.getAdministratorId());
-        System.out.println("Filter Executor ID: " + filter.getExecutorId());
-
         SortDto sort = new SortDto();
         sort.setField(sortField);
         sort.setDirection(sortDirection);

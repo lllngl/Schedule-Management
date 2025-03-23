@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.hits.kt1.Enum.SlotType;
+import ru.hits.kt1.Specification.PeriodFiltration;
 import ru.hits.kt1.dto.CreateSchedulePeriodDto;
 import ru.hits.kt1.dto.FilterDto;
 import ru.hits.kt1.dto.SortDto;
@@ -20,6 +21,7 @@ import ru.hits.kt1.repository.SchedulePeriodRepository;
 import ru.hits.kt1.repository.ScheduleRepository;
 import ru.hits.kt1.repository.SlotRepository;
 
+import java.time.OffsetTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +54,17 @@ public class SchedulePeriodService {
             throw new RuntimeException("Administrator not found");
         }
 
+        OffsetTime beginTime = existingSlot.get().getBeginTime();
+        OffsetTime endTime = existingSlot.get().getEndTime();
+
+        List<SchedulePeriod> allPeriods = schedulePeriodRepository.findAllByScheduleId(DTO.getScheduleId());
+
+        for (SchedulePeriod period : allPeriods) {
+            if (period.getBeginTime().isBefore(endTime) && period.getEndTime().isAfter(beginTime)) {
+                throw new RuntimeException("The new period overlaps with existing periods");
+            }
+        }
+
         SchedulePeriod schedulePeriod = new SchedulePeriod();
 
         if (DTO.getExecutorId() != null) {
@@ -71,7 +84,8 @@ public class SchedulePeriodService {
 
         schedulePeriod.setScheduleId(DTO.getScheduleId());
         schedulePeriod.setSlotId(DTO.getSlotId());
-        schedulePeriod.setBeginTime(existingSlot.get().getBeginTime());
+        schedulePeriod.setBeginTime(beginTime);
+        schedulePeriod.setEndTime(endTime);
         schedulePeriod.setAdministratorId(administratorId);
         schedulePeriod.setSlotType(DTO.getSlotType() != null ? DTO.getSlotType() : SlotType.UNDEFINED);
 
@@ -84,9 +98,6 @@ public class SchedulePeriodService {
     }
 
     public List<SchedulePeriod> getAllPeriods(FilterDto filter, SortDto sort, int page, int size) {
-        System.out.println("Filter: " + filter);
-        System.out.println("Sort: " + sort);
-
         Specification<SchedulePeriod> spec = Specification
                 .where(PeriodFiltration.withId(filter.getId()))
                 .and(PeriodFiltration.withSlotId(filter.getSlotId()))
@@ -100,11 +111,7 @@ public class SchedulePeriodService {
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
 
-        System.out.println("Pageable: " + pageable); // Логируем Pageable
-
         Page<SchedulePeriod> periodsPage = schedulePeriodRepository.findAll(spec, pageable);
-
-        System.out.println("Total elements: " + periodsPage.getTotalElements()); // Логируем общее количество записей
 
         return periodsPage.getContent();
     }

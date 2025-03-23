@@ -1,4 +1,4 @@
-package ru.hits.kt1.services;
+package ru.hits.kt1.Specification;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.hits.kt1.Enum.SlotType;

@@ -26,4 +26,6 @@ public class SchedulePeriod {
     private String executorId;
     @Column(name = "begin_time", nullable = false)
     private OffsetTime beginTime;
+    @Column(name = "end_time", nullable = false)
+    private OffsetTime endTime;
 }

@@ -14,4 +14,5 @@ public class PeriodDto {
     private String administratorId;
     private String executorId;
     private OffsetTime beginTime;
+    private OffsetTime endTime;
 }
