@@ -22,6 +22,6 @@ public class SlotController {
         return slotService.getSlotById(id);
     }
 
-    @DeleteMapping("/{id")
+    @DeleteMapping("/{id}")
     public void deleteSlot(@PathVariable String id) { slotService.deleteSlot(id); }
 }
