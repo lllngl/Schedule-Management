@@ -4,28 +4,33 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.hits.kt1.Enum.SlotType;
 
-import java.time.OffsetTime;
-
 @Data
 @Entity
 @Table(name = "schedule_period")
+@EqualsAndHashCode(exclude = {"schedule", "slot", "administrator", "executor"})
+@ToString(exclude = {"schedule", "slot", "administrator", "executor"})
 public class SchedulePeriod {
     @Id
     @Column(updatable = false, length = 32)
     private String id;
-    @Column(name = "slot_id", nullable = false, length = 32)
-    private String slotId;
-    @Column(name = "schedule_id", nullable = false, length = 32)
-    private String scheduleId;
+
+    @OneToOne
+    @JoinColumn(name = "slot_id", nullable = false, unique = true)
+    private Slot slot;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "slot_type", nullable = false, length = 20)
     private SlotType slotType;
-    @Column(name = "administrator_id", nullable = false, length = 32)
-    private String administratorId;
-    @Column(name = "executor_id", length = 32)
-    private String executorId;
-    @Column(name = "begin_time", nullable = false)
-    private OffsetTime beginTime;
-    @Column(name = "end_time", nullable = false)
-    private OffsetTime endTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "administrator_id", nullable = false)
+    private Employee administrator;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "executor_id")
+    private Employee executor;
 }

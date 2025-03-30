@@ -31,14 +31,12 @@ public class ScheduleService {
         }
 
         Schedule schedule = new Schedule();
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        schedule.setId(uuid);
-
+        schedule.setId(UUID.randomUUID().toString().replace("-", ""));
         schedule.setScheduleName(DTO.getScheduleName());
-        var date = LocalDateTime.now();
-        schedule.setCreationDate(date);
-        schedule.setUpdateDate(date);
+
+        LocalDateTime now = LocalDateTime.now();
+        schedule.setCreationDate(now);
+        schedule.setUpdateDate(now);
 
         return scheduleRepository.save(schedule);
     }
@@ -54,7 +52,7 @@ public class ScheduleService {
 
     public FullScheduleDto getFullSchedule(String id, String name) {
         if (id == null && name == null) {
-            throw new ValidationException("Both the id and the name can't be null");
+            throw new ValidationException("Both id and name can't be null");
         }
 
         Schedule schedule;
@@ -84,8 +82,8 @@ public class ScheduleService {
         fullScheduleDto.setCreationDate(schedule.getCreationDate());
         fullScheduleDto.setUpdateDate(schedule.getUpdateDate());
 
-        List<PeriodDto> periods = schedulePeriodRepository.findByScheduleIdOrderByBeginTime(schedule.getId())
-                .stream()
+        List<PeriodDto> periods = schedule.getPeriods().stream()
+                .sorted(Comparator.comparing(period -> period.getSlot().getBeginTime()))
                 .map(this::mapToPeriodDto)
                 .collect(Collectors.toList());
 
@@ -97,12 +95,12 @@ public class ScheduleService {
         PeriodDto dto = new PeriodDto();
 
         dto.setId(period.getId());
-        dto.setSlotId(period.getSlotId());
-        dto.setScheduleId(period.getScheduleId());
+        dto.setSlotId(period.getSlot().getId());
+        dto.setScheduleId(period.getSchedule().getId());
         dto.setSlotType(period.getSlotType());
-        dto.setAdministratorId(period.getAdministratorId());
-        dto.setExecutorId(period.getExecutorId());
-        dto.setBeginTime(period.getBeginTime());
+        dto.setAdministratorId(period.getAdministrator().getId());
+        dto.setExecutorId(period.getExecutor().getId());
+        dto.setBeginTime(period.getSlot().getBeginTime());
 
         return dto;
     }
@@ -110,8 +108,10 @@ public class ScheduleService {
 
 
     public void deleteSchedule(String id) {
-        if (!scheduleRepository.existsById(id)) { throw new NotFoundException("Schedule not found"); }
-        scheduleRepository.deleteById(id);
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Schedule not found"));
+
+        scheduleRepository.delete(schedule);
     }
 
 

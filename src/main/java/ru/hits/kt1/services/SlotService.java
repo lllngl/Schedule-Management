@@ -11,7 +11,6 @@ import ru.hits.kt1.repository.SlotRepository;
 import ru.hits.kt1.repository.TemplateRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -25,17 +24,12 @@ public class SlotService {
             throw new ValidationException("Fields can't be null");
         }
 
-        Optional<Template> existingTemplate = templateRepository.findById(DTO.getScheduleTemplateId());
-        if (existingTemplate.isEmpty()) {
-            throw new NotFoundException("Template not found");
-        }
+        Template template = templateRepository.findById(DTO.getScheduleTemplateId())
+                .orElseThrow(() -> new NotFoundException("Template not found"));
 
         Slot slot = new Slot();
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        slot.setId(uuid);
-
-        slot.setScheduleTemplateId(DTO.getScheduleTemplateId());
+        slot.setId(UUID.randomUUID().toString().replace("-", ""));
+        slot.setTemplate(template);
         slot.setBeginTime(DTO.getBeginTime());
         slot.setEndTime(DTO.getEndTime());
 
@@ -48,8 +42,14 @@ public class SlotService {
     }
 
     public void deleteSlot(String id) {
-        if (!slotRepository.existsById(id)) { throw new NotFoundException("Slot not found"); }
-        slotRepository.deleteById(id);
+        Slot slot = slotRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Slot not found"));
+
+        if (slot.getSchedulePeriod() != null) {
+            throw new ValidationException("Can't delete slot used in schedule periods");
+        }
+
+        slotRepository.delete(slot);
     }
 
     public List<Slot> getAllSlots() { return slotRepository.findAll(); }

@@ -23,10 +23,7 @@ public class TemplateService {
         }
 
         Template template = new Template();
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        template.setId(uuid);
-
+        template.setId(UUID.randomUUID().toString().replace("-", ""));
         template.setTemplateType(DTO.getTemplateType());
         template.setCreationDate(LocalDateTime.now());
         return templateRepository.save(template);
@@ -38,8 +35,10 @@ public class TemplateService {
     }
 
     public void deleteTemplate(String id) {
-        if (!templateRepository.existsById(id)) { throw new NotFoundException("Template not found"); }
-        templateRepository.deleteById(id);
+        Template template = templateRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Template not found"));
+
+        templateRepository.delete(template);
     }
 
     public List<Template> getAllTemplates() { return templateRepository.findAll(); }

@@ -23,9 +23,7 @@ import ru.hits.kt1.repository.SchedulePeriodRepository;
 import ru.hits.kt1.repository.ScheduleRepository;
 import ru.hits.kt1.repository.SlotRepository;
 
-import java.time.OffsetTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -41,62 +39,45 @@ public class SchedulePeriodService {
             throw new ValidationException("Fields can't be null");
         }
 
-        Optional<Schedule> existingSchedule = scheduleRepository.findById(DTO.getScheduleId());
-        if (existingSchedule.isEmpty()) {
-            throw new NotFoundException("Schedule not found");
-        }
+        Schedule schedule = scheduleRepository.findById(DTO.getScheduleId())
+                .orElseThrow(() -> new NotFoundException("Schedule not found"));
 
-        Optional<Slot> existingSlot = slotRepository.findById(DTO.getSlotId());
-        if (existingSlot.isEmpty()) {
-            throw new NotFoundException("Slot not found");
-        }
+        Slot slot = slotRepository.findById(DTO.getSlotId())
+                .orElseThrow(() -> new NotFoundException("Slot not found"));
 
-        Optional<Employee> existingEmployee = employeeRepository.findById(administratorId);
-        if (existingEmployee.isEmpty()) {
-            throw new NotFoundException("Administrator not found");
-        }
+        Employee administrator = employeeRepository.findById(administratorId)
+                .orElseThrow(() -> new NotFoundException("Administrator not found"));
 
         if (DTO.getSlotType() != SlotType.LOCAL && DTO.getSlotType() != SlotType.FROM_HOME &&
                 DTO.getSlotType() != SlotType.UNDEFINED && DTO.getSlotType() != null) {
             throw new ValidationException("This slot type doesn't exist");
         }
 
-        OffsetTime beginTime = existingSlot.get().getBeginTime();
-        OffsetTime endTime = existingSlot.get().getEndTime();
-
         List<SchedulePeriod> allPeriods = schedulePeriodRepository.findAllByScheduleId(DTO.getScheduleId());
 
         for (SchedulePeriod period : allPeriods) {
-            if (period.getBeginTime().isBefore(endTime) && period.getEndTime().isAfter(beginTime)) {
+            if (period.getSlot().getBeginTime().isBefore(slot.getEndTime())
+                    && period.getSlot().getEndTime().isAfter(slot.getBeginTime())) {
                 throw new ValidationException("The new period overlaps with existing periods");
             }
         }
 
-        SchedulePeriod schedulePeriod = new SchedulePeriod();
+        SchedulePeriod period = new SchedulePeriod();
+        period.setId(UUID.randomUUID().toString().replace("-", ""));
+        period.setSchedule(schedule);
+        period.setSlot(slot);
+        period.setAdministrator(administrator);
+        period.setSlotType(DTO.getSlotType() != null ? DTO.getSlotType() : SlotType.UNDEFINED);
 
         if (DTO.getExecutorId() != null) {
-            Optional<Employee> existingExecutor = employeeRepository.findById(DTO.getExecutorId());
-            if (existingExecutor.isEmpty()) {
-                throw new NotFoundException("Executor not found");
-            }
-            schedulePeriod.setExecutorId(DTO.getExecutorId());
+            Employee executor = employeeRepository.findById(DTO.getExecutorId())
+                    .orElseThrow(() -> new NotFoundException("Executor not found"));
+            period.setExecutor(executor);
+        } else {
+            period.setExecutor(administrator);
         }
 
-        if(DTO.getExecutorId() == null) {
-            schedulePeriod.setExecutorId(administratorId);
-        }
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        schedulePeriod.setId(uuid);
-
-        schedulePeriod.setScheduleId(DTO.getScheduleId());
-        schedulePeriod.setSlotId(DTO.getSlotId());
-        schedulePeriod.setBeginTime(beginTime);
-        schedulePeriod.setEndTime(endTime);
-        schedulePeriod.setAdministratorId(administratorId);
-        schedulePeriod.setSlotType(DTO.getSlotType() != null ? DTO.getSlotType() : SlotType.UNDEFINED);
-
-        return schedulePeriodRepository.save(schedulePeriod);
+        return schedulePeriodRepository.save(period);
     }
 
 

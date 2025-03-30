@@ -34,10 +34,7 @@ public class EmployeeService {
         }
 
         Employee employee = new Employee();
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        employee.setId(uuid);
-
+        employee.setId(UUID.randomUUID().toString().replace("-", ""));
         employee.setEmployeeName(DTO.getEmployeeName());
         employee.setStatus(DTO.getStatus());
         employee.setPosition(DTO.getPosition() != null ? DTO.getPosition() : Position.UNDEFINED);
